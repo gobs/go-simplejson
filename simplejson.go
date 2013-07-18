@@ -3,27 +3,69 @@ package simplejson
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"log"
+)
+
+var (
+	ErrNoMap       = errors.New("type assertion to map[string]interface{} failed")
+	ErrNoArray     = errors.New("type assertion to []interface{} failed")
+	ErrNoBool      = errors.New("type assertion to bool failed")
+	ErrNoString    = errors.New("type assertion to string failed")
+	ErrNoFloat     = errors.New("type assertion to float64 failed")
+	ErrNoByteArray = errors.New("type assertion to []byte failed")
 )
 
 // returns the current implementation version
 func Version() string {
-	return "0.4.2"
+	return "0.4.3-gobs"
 }
 
 type Json struct {
 	data interface{}
 }
 
-// NewJson returns a pointer to a new `Json` object
-// after unmarshaling `body` bytes
-func NewJson(body []byte) (*Json, error) {
+// Load json from `reader` io.Reader and return a new `Json` object
+func Load(reader io.Reader) (*Json, error) {
+	j := new(Json)
+
+	dec := json.NewDecoder(reader)
+	err := dec.Decode(&j.data)
+	if err != nil {
+		return nil, err
+	} else {
+		return j, nil
+	}
+}
+
+// Load json from `body` []byte and return a new `Json` object
+func LoadBytes(body []byte) (*Json, error) {
 	j := new(Json)
 	err := j.UnmarshalJSON(body)
 	if err != nil {
 		return nil, err
 	}
 	return j, nil
+}
+
+// Load json from `body` string and return a new `Json` object
+func LoadString(body string) (*Json, error) {
+	return LoadBytes([]byte(body))
+}
+
+// Dump Go data object to json []byte
+func DumpBytes(obj interface{}) (result []byte, err error) {
+	result, err = json.Marshal(obj)
+	return
+}
+
+// Dump Go data object to json []byte
+func DumpString(obj interface{}) (string, error) {
+	if result, err := json.Marshal(obj); err != nil {
+		return "", err
+	} else {
+		return string(result), nil
+	}
 }
 
 // Encode returns its marshaled data as `[]byte`
@@ -124,7 +166,7 @@ func (j *Json) Map() (map[string]interface{}, error) {
 	if m, ok := (j.data).(map[string]interface{}); ok {
 		return m, nil
 	}
-	return nil, errors.New("type assertion to map[string]interface{} failed")
+	return nil, ErrNoMap
 }
 
 // Array type asserts to an `array`
@@ -132,7 +174,7 @@ func (j *Json) Array() ([]interface{}, error) {
 	if a, ok := (j.data).([]interface{}); ok {
 		return a, nil
 	}
-	return nil, errors.New("type assertion to []interface{} failed")
+	return nil, ErrNoArray
 }
 
 // Bool type asserts to `bool`
@@ -140,7 +182,7 @@ func (j *Json) Bool() (bool, error) {
 	if s, ok := (j.data).(bool); ok {
 		return s, nil
 	}
-	return false, errors.New("type assertion to bool failed")
+	return false, ErrNoBool
 }
 
 // String type asserts to `string`
@@ -148,7 +190,7 @@ func (j *Json) String() (string, error) {
 	if s, ok := (j.data).(string); ok {
 		return s, nil
 	}
-	return "", errors.New("type assertion to string failed")
+	return "", ErrNoString
 }
 
 // Float64 type asserts to `float64`
@@ -156,7 +198,7 @@ func (j *Json) Float64() (float64, error) {
 	if i, ok := (j.data).(float64); ok {
 		return i, nil
 	}
-	return -1, errors.New("type assertion to float64 failed")
+	return -1, ErrNoFloat
 }
 
 // Int type asserts to `float64` then converts to `int`
@@ -165,7 +207,7 @@ func (j *Json) Int() (int, error) {
 		return int(f), nil
 	}
 
-	return -1, errors.New("type assertion to float64 failed")
+	return -1, ErrNoFloat
 }
 
 // Int type asserts to `float64` then converts to `int64`
@@ -174,7 +216,7 @@ func (j *Json) Int64() (int64, error) {
 		return int64(f), nil
 	}
 
-	return -1, errors.New("type assertion to float64 failed")
+	return -1, ErrNoFloat
 }
 
 // Bytes type asserts to `[]byte`
@@ -182,7 +224,7 @@ func (j *Json) Bytes() ([]byte, error) {
 	if s, ok := (j.data).(string); ok {
 		return []byte(s), nil
 	}
-	return nil, errors.New("type assertion to []byte failed")
+	return nil, ErrNoByteArray
 }
 
 // StringArray type asserts to an `array` of `string`
@@ -323,3 +365,8 @@ func (j *Json) MustFloat64(args ...float64) float64 {
 
 	return def
 }
+
+//
+// basic type for quick conversion to JSON
+//
+type Bag map[string]interface{}

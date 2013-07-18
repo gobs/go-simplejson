@@ -15,7 +15,7 @@ func TestSimplejson(t *testing.T) {
 
 	log.SetOutput(ioutil.Discard)
 
-	js, err := NewJson([]byte(`{ 
+	js, err := LoadBytes([]byte(`{ 
 		"test": { 
 			"string_array": ["asdf", "ghjk", "zxcv"],
 			"array": [1, "2", 3],
