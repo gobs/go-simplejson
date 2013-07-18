@@ -1,3 +1,15 @@
+
+This is a fork of [go-simplejson](//github.com/bitly/go-simplejson)
+
+## Installation
+
+    $ go get github.com/gobs/simplejson
+  
+## Documentation
+http://godoc.org/github.com/gobs/simplejson
+
+----
+
 ### go-simplejson
 
 a Go package to interact with arbitrary JSON
