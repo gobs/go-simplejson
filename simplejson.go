@@ -25,6 +25,11 @@ type Json struct {
 	data interface{}
 }
 
+// Cast to Json{}
+func AsJson(obj interface{}) *Json {
+    return &Json{obj}
+}
+
 // Load json from `reader` io.Reader and return a new `Json` object
 func Load(reader io.Reader) (*Json, error) {
 	j := new(Json)
