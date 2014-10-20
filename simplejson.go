@@ -27,7 +27,7 @@ type Json struct {
 
 // Cast to Json{}
 func AsJson(obj interface{}) *Json {
-    return &Json{obj}
+	return &Json{obj}
 }
 
 // Load json from `reader` io.Reader and return a new `Json` object
@@ -164,6 +164,11 @@ func (j *Json) CheckGet(key string) (*Json, bool) {
 		}
 	}
 	return nil, false
+}
+
+// Return value as interface{}
+func (j *Json) Data() interface{} {
+	return j.data
 }
 
 // Map type asserts to `map`
