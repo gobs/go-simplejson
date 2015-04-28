@@ -187,6 +187,16 @@ func (j *Json) Array() ([]interface{}, error) {
 	return nil, ErrNoArray
 }
 
+// MakeArray always return an `array`
+// (this is useful for HAL responses that can return either an array or a single element ):
+func (j *Json) MakeArray() []interface{} {
+	if a, ok := (j.data).([]interface{}); ok {
+		return a
+	} else {
+		return []interface{}{j.data}
+	}
+}
+
 // Bool type asserts to `bool`
 func (j *Json) Bool() (bool, error) {
 	if s, ok := (j.data).(bool); ok {
