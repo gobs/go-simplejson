@@ -375,7 +375,7 @@ func (j *Json) MustInt64(args ...int64) int64 {
 	case 1:
 		def = args[0]
 	default:
-		log.Panicf("MustInt() received too many arguments %d", len(args))
+		log.Panicf("MustInt64() received too many arguments %d", len(args))
 	}
 
 	i, err := j.Int64()
