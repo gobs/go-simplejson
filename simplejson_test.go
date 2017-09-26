@@ -137,3 +137,11 @@ func TestStdlibInterfaces(t *testing.T) {
 	assert.Equal(t, nil, json.Unmarshal(p, val2))
 	assert.Equal(t, val, val2) // stable
 }
+
+func TestNil(t *testing.T) {
+	var jp *Json
+	assert.Equal(t, jp.Nil(), true)
+
+	var j Json
+	assert.Equal(t, j.Nil(), true)
+}

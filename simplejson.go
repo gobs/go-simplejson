@@ -98,6 +98,11 @@ func (j *Json) Set(key string, val interface{}) {
 	m[key] = val
 }
 
+// Nil returns true if this json object is nil
+func (j *Json) Nil() bool {
+	return j == nil || j.data == nil
+}
+
 // Get returns a pointer to a new `Json` object
 // for `key` in its `map` representation
 //
