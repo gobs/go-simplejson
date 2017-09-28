@@ -1,6 +1,7 @@
 package simplejson
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io"
@@ -59,14 +60,19 @@ func LoadString(body string) (*Json, error) {
 }
 
 // Dump Go data object to json []byte
-func DumpBytes(obj interface{}) (result []byte, err error) {
-	result, err = json.Marshal(obj)
-	return
+func DumpBytes(obj interface{}) ([]byte, error) {
+	// turns out json.Marsh HTMLEncodes string values to please some browsers
+	// result, err := json.Marshal(obj)
+	var b bytes.Buffer
+	enc := json.NewEncoder(&b)
+	enc.SetEscapeHTML(false)
+	err := enc.Encode(obj)
+	return b.Bytes(), err
 }
 
 // Dump Go data object to json []byte
 func DumpString(obj interface{}) (string, error) {
-	if result, err := json.Marshal(obj); err != nil {
+	if result, err := DumpBytes(obj); err != nil {
 		return "", err
 	} else {
 		return string(result), nil
@@ -85,7 +91,7 @@ func (j *Json) UnmarshalJSON(p []byte) error {
 
 // Implements the json.Marshaler interface.
 func (j *Json) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&j.data)
+	return DumpBytes(&j.data)
 }
 
 // Set modifies `Json` map by `key` and `value`

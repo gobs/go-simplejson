@@ -145,3 +145,14 @@ func TestNil(t *testing.T) {
 	var j Json
 	assert.Equal(t, j.Nil(), true)
 }
+
+func TestDump(t *testing.T) {
+	v := map[string]interface{}{
+		"name":  "test",
+		"value": ">=10",
+	}
+
+	res, err := DumpString(v)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, res, `{"name":"test","value":">=10"}`+"\n")
+}
