@@ -152,7 +152,29 @@ func TestDump(t *testing.T) {
 		"value": ">=10",
 	}
 
-	res, err := DumpString(v)
+	res, err := DumpString(v, EscapeHTML(false))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, res, `{"name":"test","value":">=10"}`+"\n")
+}
+
+func TestDumpIndent(t *testing.T) {
+	v := map[string]interface{}{
+		"name":  "test",
+		"value": ">=10",
+	}
+
+	res, err := DumpString(v, Indent("  "))
+	assert.Equal(t, nil, err)
+	assert.Equal(t, res, "{\n  \"name\": \"test\",\n  \"value\": \">=10\"\n}\n")
+}
+
+func TestRaw(t *testing.T) {
+	v := map[string]interface{}{
+		"name":  "test",
+		"value": Raw(`{"a":1,"b":2}`),
+	}
+
+	res, err := DumpString(v)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, res, `{"name":"test","value":{"a":1,"b":2}}`+"\n")
 }

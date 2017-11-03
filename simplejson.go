@@ -59,20 +59,39 @@ func LoadString(body string) (*Json, error) {
 	return LoadBytes([]byte(body))
 }
 
+type DumpOption func(enc *json.Encoder)
+
+func EscapeHTML(escape bool) DumpOption {
+	return func(enc *json.Encoder) {
+		enc.SetEscapeHTML(escape)
+	}
+}
+
+func Indent(s string) DumpOption {
+	return func(enc *json.Encoder) {
+		enc.SetIndent("", s)
+	}
+}
+
 // Dump Go data object to json []byte
-func DumpBytes(obj interface{}) ([]byte, error) {
+func DumpBytes(obj interface{}, options ...DumpOption) ([]byte, error) {
 	// turns out json.Marsh HTMLEncodes string values to please some browsers
 	// result, err := json.Marshal(obj)
 	var b bytes.Buffer
 	enc := json.NewEncoder(&b)
 	enc.SetEscapeHTML(false)
+
+	for _, opt := range options {
+		opt(enc)
+	}
+
 	err := enc.Encode(obj)
 	return b.Bytes(), err
 }
 
 // Dump Go data object to json []byte
-func DumpString(obj interface{}) (string, error) {
-	if result, err := DumpBytes(obj); err != nil {
+func DumpString(obj interface{}, options ...DumpOption) (string, error) {
+	if result, err := DumpBytes(obj, options...); err != nil {
 		return "", err
 	} else {
 		return string(result), nil
@@ -425,3 +444,9 @@ func (j *Json) MustFloat64(args ...float64) float64 {
 // basic type for quick conversion to JSON
 //
 type Bag map[string]interface{}
+
+//
+// this is an alias for json.RawMessage, for clients that don't include encoding/json
+//
+
+type Raw = json.RawMessage
