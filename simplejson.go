@@ -102,21 +102,21 @@ func DumpString(obj interface{}, options ...DumpOption) (string, error) {
 }
 
 // MustDumpBytes encode Go data object to JSON []byte (panic in case of error)
-func MustDumpBytes(obj interface{}, options ...DumpOption) string {
+func MustDumpBytes(obj interface{}, options ...DumpOption) []byte {
 	if res, err := DumpBytes(obj, options...); err != nil {
 		panic(err)
-	}
-
-	return res
+	} else {
+	        return res
+        }
 }
 
 // MustDumpString encode Go data object to JSON string (panic in case of error)
 func MustDumpString(obj interface{}, options ...DumpOption) string {
 	if res, err := DumpString(obj, options...); err != nil {
 		panic(err)
-	}
-
-	return res
+	} else {
+	        return res
+        }
 }
 
 // Encode returns its marshaled data as `[]byte`
