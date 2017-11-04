@@ -31,7 +31,7 @@ func AsJson(obj interface{}) *Json {
 	return &Json{obj}
 }
 
-// Load json from `reader` io.Reader and return a new `Json` object
+// Load loads JSON from `reader` io.Reader and return a new `Json` object
 func Load(reader io.Reader) (*Json, error) {
 	j := new(Json)
 
@@ -44,7 +44,7 @@ func Load(reader io.Reader) (*Json, error) {
 	}
 }
 
-// Load json from `body` []byte and return a new `Json` object
+// LoadBytes load JSON from `body` []byte and return a new `Json` object
 func LoadBytes(body []byte) (*Json, error) {
 	j := new(Json)
 	err := j.UnmarshalJSON(body)
@@ -54,26 +54,29 @@ func LoadBytes(body []byte) (*Json, error) {
 	return j, nil
 }
 
-// Load json from `body` string and return a new `Json` object
+// LoadString loads JSON from `body` string and return a new `Json` object
 func LoadString(body string) (*Json, error) {
 	return LoadBytes([]byte(body))
 }
 
+// DumpOption is the type of DumpBytes/DumpString options
 type DumpOption func(enc *json.Encoder)
 
+// EscapeHTML instruct DumpBytes/DumpString to escape HTML in JSON valus (if true)
 func EscapeHTML(escape bool) DumpOption {
 	return func(enc *json.Encoder) {
 		enc.SetEscapeHTML(escape)
 	}
 }
 
+// Indent sets the indentation level (passed as string of spaces) for DumpBytes/DumpString
 func Indent(s string) DumpOption {
 	return func(enc *json.Encoder) {
 		enc.SetIndent("", s)
 	}
 }
 
-// Dump Go data object to json []byte
+// DumpBytes convert Go data object to JSON []byte
 func DumpBytes(obj interface{}, options ...DumpOption) ([]byte, error) {
 	// turns out json.Marsh HTMLEncodes string values to please some browsers
 	// result, err := json.Marshal(obj)
@@ -89,13 +92,31 @@ func DumpBytes(obj interface{}, options ...DumpOption) ([]byte, error) {
 	return b.Bytes(), err
 }
 
-// Dump Go data object to json []byte
+// DumpString encode Go data object to JSON string
 func DumpString(obj interface{}, options ...DumpOption) (string, error) {
 	if result, err := DumpBytes(obj, options...); err != nil {
 		return "", err
 	} else {
 		return string(result), nil
 	}
+}
+
+// MustDumpBytes encode Go data object to JSON []byte (panic in case of error)
+func MustDumpBytes(obj interface{}, options ...DumpOption) string {
+	if res, err := DumpBytes(obj, options...); err != nil {
+		panic(err)
+	}
+
+	return res
+}
+
+// MustDumpString encode Go data object to JSON string (panic in case of error)
+func MustDumpString(obj interface{}, options ...DumpOption) string {
+	if res, err := DumpString(obj, options...); err != nil {
+		panic(err)
+	}
+
+	return res
 }
 
 // Encode returns its marshaled data as `[]byte`
