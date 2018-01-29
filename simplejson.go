@@ -106,8 +106,8 @@ func MustDumpBytes(obj interface{}, options ...DumpOption) []byte {
 	if res, err := DumpBytes(obj, options...); err != nil {
 		panic(err)
 	} else {
-	        return res
-        }
+		return res
+	}
 }
 
 // MustDumpString encode Go data object to JSON string (panic in case of error)
@@ -115,8 +115,8 @@ func MustDumpString(obj interface{}, options ...DumpOption) string {
 	if res, err := DumpString(obj, options...); err != nil {
 		panic(err)
 	} else {
-	        return res
-        }
+		return res
+	}
 }
 
 // Encode returns its marshaled data as `[]byte`
@@ -466,8 +466,15 @@ func (j *Json) MustFloat64(args ...float64) float64 {
 //
 type Bag map[string]interface{}
 
-//
 // this is an alias for json.RawMessage, for clients that don't include encoding/json
-//
-
 type Raw = json.RawMessage
+
+// this is an alias for json.Marshal, for clients that don't include encoding/json
+func Marshal(v interface{}) ([]byte, error) {
+	return json.Marshal(v)
+}
+
+// this is an alias for json.Unmarshal, for clients that don't include encoding/json
+func Unmarshal(data []byte, v interface{}) error {
+	return json.Unmarshal(data, v)
+}
