@@ -59,6 +59,31 @@ func LoadString(body string) (*Json, error) {
 	return LoadBytes([]byte(body))
 }
 
+// LoadPartial load JSON from `body` []byte and return a new `Json` object.
+// It also returns any remaining bytes from the input.
+func LoadPartial(body []byte) (*Json, []byte, error) {
+	j := new(Json)
+	b := bytes.NewReader(body)
+
+	dec := json.NewDecoder(b)
+	err := dec.Decode(&j.data)
+
+	n := (dec.Buffered().(*bytes.Reader)).Len() + b.Len()
+	rest := body[len(body)-n:]
+
+	if err != nil {
+		return nil, rest, err
+	}
+	return j, rest, nil
+}
+
+// LoadPartialString load JSON from `body` string and return a new `Json` object.
+// It also returns any remaining bytes from the input.
+func LoadPartialString(body string) (*Json, string, error) {
+	j, rest, err := LoadPartial([]byte(body))
+	return j, string(rest), err
+}
+
 // DumpOption is the type of DumpBytes/DumpString options
 type DumpOption func(enc *json.Encoder)
 

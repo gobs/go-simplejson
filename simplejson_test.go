@@ -1,6 +1,7 @@
 package simplejson
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/bmizerany/assert"
 	"io/ioutil"
@@ -177,4 +178,20 @@ func TestRaw(t *testing.T) {
 	res, err := DumpString(v)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, res, `{"name":"test","value":{"a":1,"b":2}}`+"\n")
+}
+
+func TestLoadPartial(t *testing.T) {
+	input := []byte(`{"a":1,"b":2} [1,2,3,4] {"hello": "there"}`)
+
+	for len(input) > 0 {
+		j, rest, err := LoadPartial(input)
+		if err == nil {
+			t.Log(j)
+		} else {
+			t.Log("ERROR", err)
+			break
+		}
+
+		input = bytes.TrimSpace(rest)
+	}
 }
